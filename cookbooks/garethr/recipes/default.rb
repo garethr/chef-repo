@@ -5,7 +5,7 @@
 end
 
 git "/home/vagrant/.oh-my-zsh" do
-  repository "https://github.com/robbyrussell/oh-my-zsh.git"
+  repository node[:garethr][:ohmyzsh] 
   action :checkout
   user "vagrant"
   group "vagrant"
@@ -20,7 +20,7 @@ end
 execute "usermod -s /bin/zsh vagrant"
 
 git "/home/vagrant/.vim" do
-  repository "https://github.com/jtimberman/dotvim.git"
+  repository node[:garethr][:dotvim]
   action :checkout
   user "vagrant"
 end
