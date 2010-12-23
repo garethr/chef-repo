@@ -1,4 +1,3 @@
-
 %w{zsh wget curl git-core ack vim}.each do |pkg|
   package pkg do
     action :install
@@ -18,10 +17,7 @@ execute ".zshrc" do
   user "vagrant"
 end
 
-file "/etc/profile.d/zsh.sh" do
-  content "export SHELL=/bin/zsh"
-  action :create
-end
+execute "usermod -s /bin/zsh vagrant"
 
 git "/home/vagrant/.vim" do
   repository "https://github.com/jtimberman/dotvim.git"
@@ -33,4 +29,3 @@ link "/home/vagrant/.vimrc" do
   to "/home/vagrant/.vim/vimrc"
   owner "vagrant"
 end
-
