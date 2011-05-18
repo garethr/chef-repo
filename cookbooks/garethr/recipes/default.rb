@@ -25,6 +25,11 @@ git "/home/vagrant/.vim" do
   user "vagrant"
 end
 
+execute "compile command-t extension for vim"
+  command "cd /home/vagrant/.vim/ruby/command-t; ruby extconf.rb; make clean; make"
+  user "vagrant"
+end
+
 link "/home/vagrant/.vimrc" do
   to "/home/vagrant/.vim/vimrc"
   owner "vagrant"
