@@ -1,36 +1,57 @@
-%w{zsh wget curl lynx git-core ack-grep vim}.each do |pkg|
-  package pkg do
-    action :install
-  end
+cookbook_file "/etc/ssh/sshd_config" do
+  source "sshd_config"
 end
 
-git "/home/vagrant/.oh-my-zsh" do
-  repository node[:garethr][:ohmyzsh] 
-  action :checkout
-  user "vagrant"
-  group "vagrant"
+service "ssh" do
+  supports :status => true, :restart => true, :reload => true
+  action [:enable, :start]
+  subscribes :reload, resources(:cookbook_file => "/etc/ssh/sshd_config"), :immediately
 end
 
-execute ".zshrc" do
-  command "cp /home/vagrant/.oh-my-zsh/templates/zshrc.zsh-template /home/vagrant/.zshrc"
-  creates "/home/vagrant/.zshrc"
-  user "vagrant"
+link "/usr/bin/useradd" do
+  to "/usr/sbin/useradd"
 end
 
-execute "usermod -s /bin/zsh vagrant"
-
-git "/home/vagrant/.vim" do
-  repository node[:garethr][:dotvim]
-  action :checkout
-  user "vagrant"
+link "/usr/bin/userdel" do
+  to "/usr/sbin/userdel"
 end
 
-execute "compile command-t extension for vim"
-  command "cd /home/vagrant/.vim/ruby/command-t; ruby extconf.rb; make clean; make"
-  user "vagrant"
+link "/usr/bin/usermod" do
+  to "/usr/sbin/usermod"
 end
 
-link "/home/vagrant/.vimrc" do
-  to "/home/vagrant/.vim/vimrc"
-  owner "vagrant"
+link "/usr/bin/groupmod" do
+  to "/usr/sbin/groupmod"
+end
+
+link "/usr/bin/groupadd" do
+  to "/usr/sbin/groupadd"
+end
+
+username = "garethr"
+home_dir = "/home/#{username}"
+passwd = "$1$lVw8Uwny$od7QA5T9boSMu.XWnrtTY0"
+
+user username do
+  uid "1000"
+  password passwd
+  supports :manage_home => true
+  home home_dir
+end
+
+directory "#{home_dir}/.ssh" do
+  owner username
+  group username
+  mode "0700"
+end
+
+cookbook_file "#{home_dir}/.ssh/authorized_keys" do
+  source "authorized_keys"
+  mode "0600"
+  owner username
+  group username
+end
+
+group "sysadmin" do
+  members ["garethr"]
 end
